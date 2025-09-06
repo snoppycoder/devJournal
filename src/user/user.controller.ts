@@ -32,4 +32,22 @@ export class UserController {
     const response = await this.userService.getMyJournals(req.user['id']);
     return response;
   }
+  @Post('/like')
+  @UseGuards(JwtAuthGuard)
+  async likeAJournal(@Body() body: { journalId: number }, @Request() req) {
+    const response = await this.userService.likeAJournal(
+      req.user['id'],
+      body.journalId,
+    );
+    return response;
+  }
+  @Post('/dislike')
+  @UseGuards(JwtAuthGuard)
+  async DisLikeAJournal(@Body() body: { journalId: number }, @Request() req) {
+    const response = await this.userService.DisLikeAJournal(
+      req.user['id'],
+      body.journalId,
+    );
+    return response;
+  }
 }

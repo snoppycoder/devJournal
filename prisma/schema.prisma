@@ -19,11 +19,15 @@ model User  {
   id       Int      @id @default(autoincrement())
   name     String   @unique()
   password String   
+  reactedEntries Entry[] @relation("Reactions")
 }
 
 model Entry {
   id       Int      @id @default(autoincrement())
   user_id  Int      
   user     User     @relation(fields:[user_id], references: [id])
-  content  String   
+  content  String  
+  like     Int      @default(0) 
+  dislike  Int      @default(0) 
+  reacted  User[]   @relation("Reactions")
 }

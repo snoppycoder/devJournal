@@ -42,4 +42,75 @@ export class UserService {
     });
     return lists;
   }
+
+  async likeAJournal(id: number, journalId: number) {
+    const userReacted = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        reactedEntries: true,
+      },
+    });
+    if (!userReacted) {
+      throw new Error('User not found');
+    }
+    const reactedEntries = userReacted.reactedEntries || [];
+    if (reactedEntries.some((entry) => entry.id === journalId)) {
+      return { success: false, message: 'You reacted to this post already' };
+    }
+    const journal = await this.prisma.entry.update({
+      where: {
+        id: journalId,
+      },
+      data: {
+        like: { increment: 1 },
+      },
+    });
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        reactedEntries: {
+          connect: { id: journalId },
+        },
+      },
+    });
+    return {
+      success: true,
+      message: 'You liked this post',
+    };
+  }
+  async DisLikeAJournal(id: number, journalId: number) {
+    const userReacted = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        reactedEntries: true,
+      },
+    });
+    if (!userReacted) {
+      throw new Error('User not found');
+    }
+    const reactedEntries = userReacted.reactedEntries || [];
+    if (reactedEntries.some((entry) => entry.id === journalId)) {
+      return { success: false, message: 'You reacted to this post already' };
+    }
+    const journal = await this.prisma.entry.update({
+      where: {
+        id: journalId,
+      },
+      data: {
+        dislike: { increment: 1 },
+      },
+    });
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        reactedEntries: {
+          connect: { id: journalId },
+        },
+      },
+    });
+    return {
+      success: true,
+      message: 'You disliked this post',
+    };
+  }
 }
